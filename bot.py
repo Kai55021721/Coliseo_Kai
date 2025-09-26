@@ -12,7 +12,7 @@ from game import Game, ABSURD_SKILLS
 # --- CONFIGURACIÓN IMPORTANTE ---
 ADMIN_CHAT_ID = 1890046858 # <--- REEMPLAZA CON TU USER ID
 CHANNEL_ID = -1003186635788 # <--- REEMPLAZA CON EL ID DE TU CANAL
-WEBAPP_URL = "https://tu-usuario.github.io/Coliseo_Kai/webapp/"  # <--- REEMPLAZA CON TU URL DE GITHUB PAGES
+WEBAPP_URL = "https://Kai55021721.github.io/Coliseo_Kai/webapp/"  # <--- REEMPLAZA CON TU URL DE GITHUB PAGES
 
 # Estados para la conversación
 GET_EVIDENCE = range(1)
