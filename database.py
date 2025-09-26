@@ -21,32 +21,33 @@ def initialize_db():
     conn.commit()
     conn.close()
 
-def add_player_submission(user_id, user_name, character_name, specialty, absurd_skill, is_champion):
+# <--- CAMBIO: La función ya no necesita saber si es campeón al añadir la solicitud.
+def add_player_submission(user_id, user_name, character_name, specialty, absurd_skill):
     """Añade una nueva solicitud de jugador a la base de datos, pendiente de aprobación."""
     conn = sqlite3.connect(DB_NAME)
     cursor = conn.cursor()
     try:
         cursor.execute('''
-            INSERT INTO players (user_id, user_name, character_name, specialty, absurd_skill, is_champion, is_approved)
-            VALUES (?, ?, ?, ?, ?, ?, 0)
+            INSERT INTO players (user_id, user_name, character_name, specialty, absurd_skill, is_approved)
+            VALUES (?, ?, ?, ?, ?, 0)
             ON CONFLICT(user_id) DO UPDATE SET
             character_name=excluded.character_name,
             specialty=excluded.specialty,
             absurd_skill=excluded.absurd_skill,
-            is_champion=excluded.is_champion,
             is_approved=0
-        ''', (user_id, user_name, character_name, specialty, absurd_skill, is_champion))
+        ''', (user_id, user_name, character_name, specialty, absurd_skill))
         conn.commit()
     except sqlite3.Error as e:
         print(f"Error en la base de datos al añadir solicitud: {e}")
     finally:
         conn.close()
 
-def approve_player(user_id):
-    """Marca a un jugador como aprobado."""
+# <--- CAMBIO: Ahora la función de aprobar acepta el estatus de campeón.
+def approve_player(user_id, is_champion):
+    """Marca a un jugador como aprobado y asigna su estatus."""
     conn = sqlite3.connect(DB_NAME)
     cursor = conn.cursor()
-    cursor.execute('UPDATE players SET is_approved = 1 WHERE user_id = ?', (user_id,))
+    cursor.execute('UPDATE players SET is_approved = 1, is_champion = ? WHERE user_id = ?', (is_champion, user_id))
     conn.commit()
     conn.close()
 
@@ -67,8 +68,8 @@ def get_player_info(user_id):
     conn.close()
     return player
 
+# ... (El resto de funciones de database.py no cambian)
 def get_approved_players():
-    """Devuelve una lista de todos los jugadores aprobados."""
     conn = sqlite3.connect(DB_NAME)
     cursor = conn.cursor()
     cursor.execute('SELECT * FROM players WHERE is_approved = 1')
@@ -77,7 +78,6 @@ def get_approved_players():
     return rows
 
 def clear_all_players():
-    """Limpia la tabla de jugadores para un nuevo torneo."""
     conn = sqlite3.connect(DB_NAME)
     cursor = conn.cursor()
     cursor.execute('DELETE FROM players')
@@ -85,7 +85,6 @@ def clear_all_players():
     conn.close()
 
 def player_exists(user_id):
-    """Verifica si un jugador (aprobado o no) ya existe."""
     conn = sqlite3.connect(DB_NAME)
     cursor = conn.cursor()
     cursor.execute('SELECT 1 FROM players WHERE user_id = ?', (user_id,))
