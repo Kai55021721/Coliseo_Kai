@@ -21,7 +21,6 @@ def initialize_db():
     conn.commit()
     conn.close()
 
-# <--- CAMBIO: La función ya no necesita saber si es campeón al añadir la solicitud.
 def add_player_submission(user_id, user_name, character_name, specialty, absurd_skill):
     """Añade una nueva solicitud de jugador a la base de datos, pendiente de aprobación."""
     conn = sqlite3.connect(DB_NAME)
@@ -42,7 +41,6 @@ def add_player_submission(user_id, user_name, character_name, specialty, absurd_
     finally:
         conn.close()
 
-# <--- CAMBIO: Ahora la función de aprobar acepta el estatus de campeón.
 def approve_player(user_id, is_champion):
     """Marca a un jugador como aprobado y asigna su estatus."""
     conn = sqlite3.connect(DB_NAME)
@@ -68,8 +66,8 @@ def get_player_info(user_id):
     conn.close()
     return player
 
-# ... (El resto de funciones de database.py no cambian)
 def get_approved_players():
+    """Devuelve una lista de todos los jugadores aprobados."""
     conn = sqlite3.connect(DB_NAME)
     cursor = conn.cursor()
     cursor.execute('SELECT * FROM players WHERE is_approved = 1')
@@ -78,6 +76,7 @@ def get_approved_players():
     return rows
 
 def clear_all_players():
+    """Limpia la tabla de jugadores para un nuevo torneo."""
     conn = sqlite3.connect(DB_NAME)
     cursor = conn.cursor()
     cursor.execute('DELETE FROM players')
@@ -85,6 +84,7 @@ def clear_all_players():
     conn.close()
 
 def player_exists(user_id):
+    """Verifica si un jugador (aprobado o no) ya existe."""
     conn = sqlite3.connect(DB_NAME)
     cursor = conn.cursor()
     cursor.execute('SELECT 1 FROM players WHERE user_id = ?', (user_id,))
